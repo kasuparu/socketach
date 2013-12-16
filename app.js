@@ -27,11 +27,19 @@ app.get('/', function(req, res) {
 });
 
 // API
+posts = [
+	{
+		id: 1,
+		msg: 'Initial post'
+	}
+]
+
 io.sockets.on('connection', function(socket) {
 	socket.on('enter', function(data) {
 		socket.room = 'chat';
 		socket.join(socket.room);
-		socket.emit('update', 'SERVER: you have connected to ' + socket.room);
+		socket.emit('update', {'SERVER: you have connected to ' + socket.room});
+		socket.emit('initPosts', {p: posts});
 		socket.broadcast.to(socket.room).emit('update', 'SERVER: some user has entered ' + socket.room);
 	});
 });
