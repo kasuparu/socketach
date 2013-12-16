@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!--  ng-app="socketachApp"  -->
+	<head>
+		<title><%=siteName %></title>
+		<!--<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
+		<link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" href="/plusstrap/docs/assets/css/plusstrap.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="/plusstrap/docs/assets/css/plusstrap-responsive.css" />
+		<link rel="stylesheet" type="text/css" href="/plusstrap/docs/assets/css/docs.css" />
+		<link rel="stylesheet" type="text/css" href="/default.css" />-->
+		
+		<script type="text/javascript">
+
+		  /*var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-35029575-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();*/
+		</script>
+		
+		<script src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular-resource.js"></script>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular-route.js"></script>
+		<script type="text/javascript" src="/ng.js"></script>
+		
+		<script>
+			var socket = io.connect('http://localhost');
+			socket.on('connect', function() {
+				socket.emit('enter');
+			});
+			socket.on('update', function (data) {
+				console.log(data);
+				//socket.emit('enter');
+			});
+		</script>
+	</head>
+<body data-spy="scroll"> 
+<div class="container-fluid static-index">
+	<div ng-view></div>
+	<div class="push"></div>
+</div>
+
+</body>
+</html>

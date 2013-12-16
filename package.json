@@ -1,0 +1,20 @@
+{
+  "name": "socketach",
+  "preferGlobal": true,
+  "version": "0.1.0",
+  "author": "@kasuparu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kasuparu/socketach.js"
+  },
+  "dependencies": {
+    "foreman": "0.0.25",
+    "express": "3.4.x",
+    "ejs": "~0.8.4",
+    "socket.io": "~0.9.16"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.8"
+  }
+}
