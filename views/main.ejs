@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><!--  ng-app="socketachApp"  -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" ng-app="socketachApp"><!--  ng-app="socketachApp"  -->
 	<head>
 		<title><%=siteName %></title>
 		<!--<link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/favicon.ico" />
@@ -28,17 +28,18 @@
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular-resource.js"></script>
 		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.2/angular-route.js"></script>
-		<script type="text/javascript" src="/ng.js"></script>
+		<script type="text/javascript" src="socket.js"></script>
+		<script type="text/javascript" src="ng.js"></script>
 		
 		<script>
-			var socket = io.connect('http://localhost');
+			/*var socket = io.connect('http://localhost');
 			socket.on('connect', function() {
 				socket.emit('enter');
 			});
 			socket.on('update', function (data) {
 				console.log(data);
 				//socket.emit('enter');
-			});
+			});*/
 		</script>
 	</head>
 <body data-spy="scroll"> 

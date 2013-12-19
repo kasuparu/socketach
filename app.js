@@ -6,6 +6,12 @@ var express = require('express'),
 	io = require('socket.io').listen(server)
 	cfg = require('./config.' + env);
 
+if(!Array.prototype.last) {
+    Array.prototype.last = function() {
+        return this[this.length - 1];
+    }
+}
+
 // App
 app.configure(function(){
 	app	.use(express.logger())
@@ -27,20 +33,35 @@ app.get('/', function(req, res) {
 });
 
 // API
-posts = [
+messages = [
 	{
 		id: 1,
-		msg: 'Initial post'
+		msg: 'Initial post',
+		ts: new Date().getTime() - 86400000
+	},
+	{
+		id: 2,
+		msg: 'Second post',
+		ts: new Date().getTime() - 100000
 	}
 ]
+
+addMessage = function(msg) {
+	var message = {
+		id: messages.last() ? messages.last().id + 1 : 0,
+		msg: msg,
+		ts: new Date().getTime()
+	}
+	messages.push(message);
+	return message;
+};
 
 io.sockets.on('connection', function(socket) {
 	socket.on('enter', function(data) {
 		socket.room = 'chat';
 		socket.join(socket.room);
-		socket.emit('update', {'SERVER: you have connected to ' + socket.room});
-		socket.emit('initPosts', {p: posts});
-		socket.broadcast.to(socket.room).emit('update', 'SERVER: some user has entered ' + socket.room);
+		socket.broadcast.to(socket.room).emit('update', addMessage('SERVER: user has entered ' + socket.room));
+		socket.emit('initMessages', {list: messages});
 	});
 });
 /*
