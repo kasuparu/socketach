@@ -46,11 +46,13 @@ socketachApp
  */
 socketachApp
 	.controller('messageListController', ['$scope', 'socket', function($scope, socket) {
+		$scope.loading = true;
 		console.log('messageListController starting');
 		$scope.messages = [];
 		socket.forward(['update', 'initMessages'], $scope);
 		
 		socket.on('connect', function () {
+			$scope.loading = false;
 			console.log('socket connected');
 			
 			$scope.$on('socket:initMessages', function(event, data) {
@@ -62,11 +64,10 @@ socketachApp
 				console.log('socket:update got a message');
 				$scope.messages.push(data);
 			});
-			
-			socket.emit('enter');
+			if (!$scope.messages.length) {
+				socket.emit('enter');
+			}
 		});
-		
-		
 	}]);
 
 /***

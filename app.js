@@ -53,17 +53,41 @@ addMessage = function(msg) {
 		ts: new Date().getTime()
 	}
 	messages.push(message);
+	if (messages.length > 30) {
+		messages.shift();
+	}
 	return message;
 };
 
+var defaultRoom = 'main';
+
 io.sockets.on('connection', function(socket) {
+	//var intervalId = false;
+	
 	socket.on('enter', function(data) {
-		socket.room = 'chat';
+		socket.room = defaultRoom;
 		socket.join(socket.room);
-		socket.broadcast.to(socket.room).emit('update', addMessage('SERVER: user has entered ' + socket.room));
+		socket.broadcast.to(socket.room).emit('update', addMessage('SERVER: user ' + socket.id + ' has entered'));
 		socket.emit('initMessages', {list: messages});
 	});
+	
+	socket.on('post', function(data) {
+		socket.broadcast.to(socket.room).emit('update', addMessage(data.msg));
+		// Client must add message to his messages on successful send itself
+	});
+	
+	/*intervalId = setInterval(function() {
+		console.log('interval broadcast ' + new Date().getTime());
+		io.sockets.in(socket.room).emit('update', addMessage(socket.id + ' ' + new Date().getTime() + 0));
+	}, 3000);*/
+	
+	socket.on('disconnect', function() {
+		socket.broadcast.to(defaultRoom).emit('update', addMessage('SERVER: user ' + socket.id + ' has quit'));
+		//clearInterval(intervalId);
+	});
 });
+
+
 /*
 app.get('/t/:id(-?\\d+)/set', function(req, res) {
     res.setHeader('content-type', jsonContentType);
