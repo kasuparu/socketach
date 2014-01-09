@@ -71,9 +71,10 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('initMessages', {list: messages});
 	});
 	
-	socket.on('post', function(data) {
-		socket.broadcast.to(socket.room).emit('update', addMessage(data.msg));
-		// Client must add message to his messages on successful send itself
+	socket.on('post', function(data, callback) {
+		var commitedMessage = addMessage(data.msg);
+		socket.broadcast.to(socket.room).emit('update', commitedMessage);
+		callback(commitedMessage);
 	});
 	
 	/*intervalId = setInterval(function() {

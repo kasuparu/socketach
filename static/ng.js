@@ -26,7 +26,7 @@ socketachApp
 								'<p class="lead">{{headerText}}</p>' +
 							'</div>' +
 						'</div>' + 
-						'<div message-list="" message-list-message="message"></div>' +
+						'<div message-list="" message-list-header="message"></div>' +
 					'</div>'
 				})
 				.otherwise({
@@ -51,6 +51,8 @@ socketachApp
 		$scope.messages = [];
 		socket.forward(['update', 'initMessages'], $scope);
 		
+		$scope.postMessage = function(message) {};
+		
 		socket.on('connect', function () {
 			$scope.loading = false;
 			console.log('socket connected');
@@ -67,7 +69,21 @@ socketachApp
 			if (!$scope.messages.length) {
 				socket.emit('enter');
 			}
+			
+			$scope.postMessage = function(message, callback) {
+				socket.emit('post', message, function(commitedMessage) {
+					$scope.messages.push(commitedMessage);
+					callback(commitedMessage);
+				});
+			};
 		});
+	}])
+	.controller('messageWriterController', ['$scope', function($scope) {
+		$scope.post = function() {
+			$scope.$parent.postMessage($scope.message, function() {
+				$scope.message = {};
+			});
+		}
 	}]);
 
 /***
@@ -93,13 +109,30 @@ socketachApp
 			scope: {
 				message: '=?message'
 			},
-			//controller: 'messageController',
 			template: '' +
 				'<div>' +
-					'<div class="row-fluid"><div class="span12">{{message.id}}: {{message.msg}}</div></div>' +
+					'<div class="row-fluid"><div class="span12"><span style="color:gray;">{{message.ts | date:\'yyyy-MM-dd HH:mm:ss.sss\'}}: </span>{{message.msg}}</div></div>' +
 				'</div>',
 			replace: true
 		};
+	})
+	.directive('messageWriter', function() {
+		return {
+			restrict: 'A',
+			scope: {
+				message: '=?message',
+			},
+			controller: 'messageWriterController',
+			template: '' +
+				'<div>' +
+					'<div class="row-fluid"><div class="span12">' +
+						'<form name="messageWriter" ng-submit="post()">' +
+							'<div class="input-prepend"><span class="add-on">Post:</span><input type="text" ng-model="message.msg" required /></div>' +
+							'</form>' +
+					'</div></div>' +
+				'</div>',
+			replace: true
+		}
 	})
 /***
  *       __ _     _   
@@ -114,12 +147,13 @@ socketachApp
 			restrict: 'A',
 			scope: {
 				elementId: '=id',
-				message: '=messageListMessage'
+				header: '=messageListHeader'
 			},
 			controller: 'messageListController',
 			template: '' +
 				'<div class="container-fluid counter-container" ng-class="{\'loading\': loading}">' +
-					'<div ng-if="message && !loading && (!messages || !messages.length)" list-message="message"></div>' +
+					'<div ng-if="message && !loading && (!messages || !messages.length)" list-header="header"></div>' +
+					'<div message-writer=""></div>' +
 					'<div ng-repeat="item in messages | orderBy:\'ts\':true" message="item"></div>' +
 				'</div>',
 			replace: true
@@ -133,14 +167,14 @@ socketachApp
  *    \/    \/\___||___/___/\__,_|\__, |\___|
  *                                |___/      
  */
-	.directive('listMessage', function() {
+	.directive('listHeader', function() {
         return {
             restrict: 'A',
             scope: {
-                    message: '=listMessage'
+                    header: '=listHeader'
             },
             template:
-                    '<div><center><p>{{message.text}}</p></center></div>',
+                    '<div><center><p>{{header.text}}</p></center></div>',
             replace: true
 		};
     })
