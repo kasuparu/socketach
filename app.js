@@ -4,7 +4,13 @@ var express = require('express'),
 	env = process.env.NODE_ENV || 'dev',
 	server = require('http').createServer(app)
 	io = require('socket.io').listen(server)
-	cfg = require('./config.' + env);
+	//cfg = require('./config.' + env)
+	cfg = {};
+	
+cfg.env = 'dev';
+cfg.hostname = 'local.sincemonday.net';
+cfg.httpPort = process.env.PORT || 3001;
+cfg.siteName = 'socketach';
 
 if(!Array.prototype.last) {
     Array.prototype.last = function() {
