@@ -39,20 +39,9 @@ app.get('/', function(req, res) {
 });
 
 // API
-messages = [
-	{
-		id: 1,
-		msg: 'Initial post',
-		ts: new Date().getTime() - 86400000
-	},
-	{
-		id: 2,
-		msg: 'Second post',
-		ts: new Date().getTime() - 100000
-	}
-]
+messages = [];
 
-addMessage = function(msg) {
+addMessage = function(msg, callback) {
 	var message = {
 		id: messages.last() ? messages.last().id + 1 : 0,
 		msg: msg,
@@ -62,25 +51,42 @@ addMessage = function(msg) {
 	if (messages.length > 30) {
 		messages.shift();
 	}
-	return message;
+	if (isFunction(callback)) {
+		callback(message);
+	}
 };
+
+isFunction = function(functionToTest) {
+	return functionToTest && {}.toString.call(functionToTest) === '[object Function]';
+}
 
 var defaultRoom = 'main';
 
 io.sockets.on('connection', function(socket) {
 	//var intervalId = false;
 	
-	socket.on('enter', function(data) {
+	socket.on('enter', function(data, callback) {
 		socket.room = defaultRoom;
 		socket.join(socket.room);
-		socket.broadcast.to(socket.room).emit('update', addMessage('SERVER: user ' + socket.id + ' has entered'));
-		socket.emit('initMessages', {list: messages});
+		
+		addMessage('SERVER: user ' + socket.id + ' has entered', function(commitedMessage) {
+			socket.broadcast.to(socket.room).emit('update', commitedMessage);
+			socket.emit('initMessages', {list: messages});
+			
+			if (isFunction(callback)) {
+				callback(commitedMessage);
+			}
+		});
 	});
 	
 	socket.on('post', function(data, callback) {
-		var commitedMessage = addMessage(data.msg);
-		socket.broadcast.to(socket.room).emit('update', commitedMessage);
-		callback(commitedMessage);
+		addMessage(data.msg, function(commitedMessage) {
+			socket.broadcast.to(socket.room).emit('update', commitedMessage);
+			
+			if (isFunction(callback)) {
+				callback(commitedMessage);
+			}
+		});
 	});
 	
 	/*intervalId = setInterval(function() {
@@ -90,7 +96,9 @@ io.sockets.on('connection', function(socket) {
 	
 	socket.on('disconnect', function() {
 		socket.broadcast.to(defaultRoom).emit('update', addMessage('SERVER: user ' + socket.id + ' has quit'));
-		//clearInterval(intervalId);
+		/*if (intervalId !== false) {
+			clearInterval(intervalId);
+		}*/
 	});
 });
 
